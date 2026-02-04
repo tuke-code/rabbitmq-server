@@ -241,7 +241,6 @@ setup_data_dir(Config) ->
         {error, {already_loaded, _}} -> ok
     end,
     ok = application:set_env(rabbit, data_dir, DataDir),
-    ok = application:set_env(mnesia, dir, DataDir),
     ok.
 
 setup_feature_flags_file(Config) ->

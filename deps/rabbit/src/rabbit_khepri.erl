@@ -180,9 +180,7 @@
          supports_rabbit_khepri_topic_trie_version/0]).
 
 -ifdef(TEST).
--export([register_projections/0,
-         force_metadata_store/1,
-         clear_forced_metadata_store/0]).
+-export([register_projections/0]).
 -endif.
 
 -type timeout_error() :: khepri:error(timeout).
@@ -2165,33 +2163,5 @@ handle_fallback(#{mnesia := MnesiaFun, khepri := KhepriFunOrRet})
               ?STORE_ID, ?MIGRATION_ID, MnesiaFun, KhepriFunOrRet)
     end.
 
--ifdef(TEST).
--define(FORCED_MDS_KEY, {?MODULE, forced_metadata_store}).
-
-force_metadata_store(Backend) ->
-    persistent_term:put(?FORCED_MDS_KEY, Backend).
-
-get_forced_metadata_store() ->
-    persistent_term:get(?FORCED_MDS_KEY, undefined).
-
-clear_forced_metadata_store() ->
-    _ = persistent_term:erase(?FORCED_MDS_KEY),
-    ok.
-
-is_enabled__internal(Blocking) ->
-    case get_forced_metadata_store() of
-        khepri ->
-            ?assert(
-               rabbit_feature_flags:is_enabled(khepri_db, non_blocking)),
-            true;
-        mnesia ->
-            ?assertNot(
-               rabbit_feature_flags:is_enabled(khepri_db, non_blocking)),
-            false;
-        undefined ->
-            rabbit_feature_flags:is_enabled(khepri_db, Blocking)
-    end.
--else.
 is_enabled__internal(Blocking) ->
     rabbit_feature_flags:is_enabled(khepri_db, Blocking).
--endif.
